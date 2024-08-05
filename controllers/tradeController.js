@@ -1,4 +1,4 @@
-// /controllers/tradeController.js
+
 
 const Trade = require('../models/tradeCalls');
 

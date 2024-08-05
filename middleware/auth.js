@@ -12,10 +12,6 @@ if(token && isCustomAuth){
     req.userId = decodedData?.sub
 }
 next()
-
-
-
-
 } catch(error){
     console.log(error)}
 

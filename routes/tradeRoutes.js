@@ -1,4 +1,4 @@
-// /routes/tradeRoutes.js
+
 const express = require('express');
 const auth = require('../middleware/auth');
 const { getAllTrades, createTrade } = require('../controllers/tradeController');

@@ -5,6 +5,6 @@ const { getAllTrades, createTrade } = require('../controllers/tradeController');
 const router = express.Router();
 
 router.get('/', getAllTrades);
-router.post('/',auth, createTrade);
+router.post('/', createTrade);
 
 module.exports = router;

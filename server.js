@@ -7,17 +7,11 @@ const cors = require('cors');
 const tradeRoutes = require('./routes/tradeRoutes');
 const dotenv = require('dotenv');
 const userRoutes = require('./routes/userRoutes');
-
-
 dotenv.config();
-
-
 const app = express();
-
 
 app.use(bodyParser.json()); 
 app.use(cors()); 
-
 mongoose.connect(process.env.connection_url, {
   useNewUrlParser: true,
   useUnifiedTopology: true,

@@ -1,31 +1,39 @@
+// middlewares/auth.js
 const jwt = require('jsonwebtoken');
+const User = require('../models/users');
 
 const auth = async (req, res, next) => {
+  const token = req.header('Authorization')?.replace('Bearer ', ''); 
+
+  if (!token) {
+    console.log('Token missing');
+    return res.status(401).json({ error: 'Not authorized, token missing' });
+  }
+
   try {
-    const authHeader = req.headers.authorization;
+    // Log the token
+    console.log('Token:', token);
 
-    if (!authHeader) {
-      return res.status(401).json({ message: 'Authorization header missing' });
+    const decoded = jwt.verify(token, 'test');
+
+    // Log the decoded token data
+    console.log('Decoded token:', decoded);
+
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      console.log('User not found');
+      throw new Error('User not found');
     }
 
-    const token = authHeader.split(' ')[1];
-    const isCustomAuth = token.length < 500; // Assuming custom tokens are less than 500 characters
-
-    let decodedData;
-
-    if (token && isCustomAuth) {
-      decodedData = jwt.verify(token, 'test');
-      req.userId = decodedData?.id;
-    } else {
-      decodedData = jwt.decode(token);
-      req.userId = decodedData?.sub;
-    }
-
+    req.user = user;
+    console.log(req.user)
     next();
-  } catch (error) {
-    console.error(error);
-    res.status(401).json({ message: 'Unauthorized' });
+  } catch (err) {
+    console.log('Error:', err); // Log the error
+    res.status(401).json({ error: 'Not authorized' });
   }
 };
+
 
 module.exports = auth;

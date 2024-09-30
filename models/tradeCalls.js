@@ -9,7 +9,11 @@ const tradeSchema = new mongoose.Schema({
   price: String,
   tp: String,
   sl: String,
-  strategy: String
+  strategy: String,
+  creator: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
 });
 
 const Trade = mongoose.model('Trade', tradeSchema);

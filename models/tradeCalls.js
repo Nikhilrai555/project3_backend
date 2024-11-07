@@ -6,10 +6,10 @@ const tradeSchema = new mongoose.Schema({
   ticker: String,
   type: String,
   description: String,
-  price: String,
-  tp: String,
-  sl: String,
-  strategy: String,
+  price: Number,
+  tp: Number,
+  sl: Number,
+  pnl: Number,
   creator: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'

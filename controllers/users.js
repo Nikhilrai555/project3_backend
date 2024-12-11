@@ -3,6 +3,8 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const User = require('../models/users') 
+const Trade = require('../models/tradeCalls')
+
  const signin = async (req,res) => {
     const {email,password} = req.body
 try{
@@ -36,21 +38,64 @@ try{
     res.status(500).json({message:"Something went wrong."})
     console.error(error)
 }}
-const getUserData = async (req, res) => {
-    try {
-      // req.user is populated by the auth middleware
-      const user = await User.findById(req.user._id);
-  
-      if (!user) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-  
-      res.status(200).json(user);
-    } catch (err) {
-      res.status(500).json({ error: 'Failed to fetch user data' });
+//only for fetching own data and tradecalls using token.
+const getMyData = async (req, res) => {
+  try {
+    // Fetch user data
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
-  };
-  
+
+    // Fetch trade calls created by the user
+    const trades = await Trade.find({ creator: req.user._id });
+
+    // Combine user data with trades
+    const userData = {
+      name: user.name,
+      email: user.email,
+      totalPnl: user.totalPnl,
+      trades, // Include the list of trades
+    };
+
+    res.status(200).json(userData);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch user data' });
+  }
+};
+//To get any users profile+tradecalls using id.
+const getUsersDataById = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId).select('-password'); // Exclude password for security
+    const trades = await Trade.find({ creator: userId }); // Find trades created by the user
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const userData = {
+      name: user.name,
+      email: user.email,
+      totalPnl: user.totalPnl,
+      trades, // Include the list of trades
+    };
+
+    res.status(200).json(userData);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch user profile' });
+  }
+};
+
+const getLeaderboard = async (req, res) => {
+  try {
+    const users = await User.find().sort({ totalPnl: -1 }); // Sort by totalPnl in descending order
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch leaderboard data' });
+  }
+};  
 
 
-module.exports = {signin,signup,getUserData}
+module.exports = {signin,signup,getMyData,getLeaderboard,getUsersDataById}
